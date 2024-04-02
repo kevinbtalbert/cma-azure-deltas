@@ -59,7 +59,7 @@ userSettings:
           label: "ADLS Credential Name"
           type: edit-text
       "target_adls_storage_account_name":
-          uiField:
+        uiField:
           label: "ADLS Storage Acct Name"
           type: text
 
