@@ -1,3 +1,5 @@
+# Copyright (c) 2023, Cloudera, Inc. All Rights Reserved.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,34 +14,39 @@
 
 ---
 
-- name: Pre-validate replication policy type
-  fail:
-    msg: "Please set the 'type_of_replication_policy_to_create' appropriately!"
-  when:
-    - type_of_replication_policy_to_create is not defined
-    - type_of_replication_policy_to_create|lower not in ['hive', 'hdfs', 'hbase']
+#FOLLOW: https://docs.cloudera.com/replication-manager/cloud/reference/topics/rm-pc-cdpcli-manage-cloud-credentials.html
 
-- name: Create temporary dir for policy description
-  tempfile:
-    state: directory
-    suffix: "{{ type_of_replication_policy_to_create|lower }}"
-  register: temp_dir
+# SYNTAX:
+# replicationmanager create-abfs-credential 
+# --name [***credential name***] 
+# --clusters [***cluster crns separated by space***] 
+# --type [***ACCESSKEY or CLIENTKEY***] --access-key [***ABFS access key***] 
+# --storage-account-name [***ABFS storage account name***] 
+# --client-id [***client ID of Active Directory service principal account***] 
+# --client-secret-key [***client Key of Active Directory service principal account***] 
+# --tenant-id [***tenant ID of Active Directory service principal account***]
 
-- name: Create replication policy description based on template
-  template:
-    src: "{{ type_of_replication_policy_to_create|lower }}_replication_policy.json.j2"
-    dest: "{{ temp_dir.path }}/{{ type_of_replication_policy_to_create|lower }}_replication_policy.json"
-  register:
-    repl_policy_json
-
-- name: Create replication policy using RM in Control Plane
+- name: Create ADLS credential for cluster
   shell: |
-    cdp --profile {{ cdp_cli_profile_id }} replicationmanager \
-    {{ 'create-hbase-policy' if type_of_replication_policy_to_create == 'hbase' else 'create-policy' }} \
-    --cli-input-json "$(cat {{ repl_policy_json.dest }})"
-  register: policy_creation
+    cdp --profile {{ cdp_cli_profile_id }} \
+    replicationmanager create-aws-credential \
+    --name "{{ target_adls_credential_name }}" \
+    --clusters "{{ source_cluster_crn }}" \
+    --type CLIENTKEY \
+    --storage-account-name "{{ target_adls_storage_account_name }}"  \
+    --client-id "{{ target_adls_client_id }}" \
+    --client-secret-key "{{ target_adls_client_key }}" \
+    --tenant-id "{{ target_adls_tenant_id }}"
+  register: adding_azure_credentials
+  changed_when: adding_azure_credentials.rc == 0
+  failed_when: '"Credential exists with name {{ target_adls_credential_name }}" not in adding_azure_credentials.stderr and adding_azure_credentials.rc != 0'
 
-- name: "Replication policy {{ replication_policy_name }} created successfully"
-  debug:
-    msg: "Replication policy {{ replication_policy_name }} created successfully"
-
+- name: Wait for AZURE credential to be available for use
+  shell: |
+    cdp --profile {{ cdp_cli_profile_id }} \
+    replicationmanager get-credentials \
+    --cluster-crn "{{ source_cluster_crn }}"
+  register: get_creds_output
+  until: "{{ target_adls_credential_name in get_creds_output.stdout | from_json | json_query('credentials[*].name') }}"
+  retries: "{{ number_of_retries_to_wait_for_aws_cred }}"
+  delay: "{{ delay_between_retries_of_waiting_for_aws_cred }}"
