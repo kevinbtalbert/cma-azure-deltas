@@ -1,0 +1,24 @@
+{
+  "name": "{{ target_adls_storage_account_name }}",
+  "displayName": "{{ target_adls_storage_account_name }}",
+  "typeName": "ADLS_AD_SVC_PRINC_AUTH",
+  "accountConfigs": {
+    "items": [
+      {
+        "name": "adls_client_id",
+        "value": "{{ adls_client_id }}",
+        "sensitive": true
+      },
+      {
+        "name": "adls_client_key",
+        "value": "{{ adls_client_key }}",
+        "sensitive": true
+      },
+      {
+	"name": "adls_tenant_id",
+	"value": "{{ adls_tenant_id }}",
+	"sensitive": true
+      }
+    ]
+  }
+}

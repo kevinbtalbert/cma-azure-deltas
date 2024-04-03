@@ -29,7 +29,7 @@
 - name: Create ADLS credential for cluster
   shell: |
     cdp --profile {{ cdp_cli_profile_id }} \
-    replicationmanager create-aws-credential \
+    replicationmanager create-abfs-credential \
     --name "{{ target_adls_credential_name }}" \
     --clusters "{{ source_cluster_crn }}" \
     --type CLIENTKEY \
