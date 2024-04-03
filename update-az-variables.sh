@@ -21,14 +21,14 @@ read -p "Enter new value for target_adls_dataset_path (for migrate_hdfs_data.yml
 # Function to update playbook files with new values
 update_playbook_files() {
     for file in "${FILES[@]}"; do
-        sed -i "s/target_adls_credential_name: .*/target_adls_credential_name: \"$target_adls_credential_name\"/" "$file"
-        sed -i "s/target_adls_storage_account_name: .*/target_adls_storage_account_name: \"$target_adls_storage_account_name\"/" "$file"
-        sed -i "s/target_adls_client_id: .*/target_adls_client_id: \"$target_adls_client_id\"/" "$file"
-        sed -i "s/target_adls_client_key: .*/target_adls_client_key: \"$target_adls_client_key\"/" "$file"
-        sed -i "s/target_adls_tenant_id: .*/target_adls_tenant_id: \"$target_adls_tenant_id\"/" "$file"
+        sed -i "s|target_adls_credential_name: .*|target_adls_credential_name: \"$target_adls_credential_name\"|" "$file"
+        sed -i "s|target_adls_storage_account_name: .*|target_adls_storage_account_name: \"$target_adls_storage_account_name\"|" "$file"
+        sed -i "s|target_adls_client_id: .*|target_adls_client_id: \"$target_adls_client_id\"|" "$file"
+        sed -i "s|target_adls_client_key: .*|target_adls_client_key: \"$target_adls_client_key\"|" "$file"
+        sed -i "s|target_adls_tenant_id: .*|target_adls_tenant_id: \"$target_adls_tenant_id\"|" "$file"
         # Specific update for migrate_hdfs_data.yml
         if [[ "$file" == "$MIGRATE_HDFS_DATA" ]]; then
-            sed -i "s/target_aws_s3_dataset_path: .*/target_aws_s3_dataset_path: \"$target_aws_s3_dataset_path\"/" "$file"
+            sed -i "s|target_aws_s3_dataset_path: .*|target_aws_s3_dataset_path: \"$target_aws_s3_dataset_path\"|" "$file"
         fi
     done
 }
