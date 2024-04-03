@@ -10,7 +10,7 @@ rm ./cma-pc-ansible/roles/replication_manager/classic_clusters/create_aws_creden
 rm ./cma-pc-ansible/roles/replication_manager/classic_clusters/create_aws_credentials/tasks/main.yml
 rm ./cma-pc-ansible/roles/cloudera_manager/setup_external_account/defaults/main.yml
 rm ./cma-pc-ansible/roles/cloudera_manager/setup_external_account/tasks/main.yml
-rm ./cma-pc-ansible/roles/cloudera_manager/setup_external_account/templates/create_azure_account.json
+rm ./cma-pc-ansible/roles/cloudera_manager/setup_external_account/templates/create_aws_account.json
 rm ./cma-pc-ansible/roles/cloudera_manager/setup_external_account/vars/main.yml
 rm ./cma-pc-ansible/playbooks/data_migration/create_hive_policy.yml
 rm ./cma-pc-ansible/playbooks/data_migration/migrate_hdfs_data.yml
